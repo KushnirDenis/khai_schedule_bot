@@ -1,4 +1,4 @@
-namespace khai_schedule_bot;
+namespace khai_schedule_bot.Tools;
 
 public static class Logger
 {
