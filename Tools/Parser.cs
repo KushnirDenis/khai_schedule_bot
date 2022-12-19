@@ -1,5 +1,4 @@
 using System.Net;
-using System.Web;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
 using khai_schedule_bot.Models;
@@ -11,16 +10,16 @@ public static class Parser
     /// <summary>
     /// Парсит группы с сайта кафедры.
     /// </summary>
-    /// <param name="department"></param>
-    /// <returns>Хеш страницы</returns>
+    /// <param name="department">Код кафедры</param>
+    /// <returns>Список групп для кафедры</returns>
     public static Group[] ParseGroups(int department)
     {
         var url = $"https://education.khai.edu/department/{department}";
 
-        HtmlWeb web = new HtmlWeb();
+        var html = ParsePage(url);
 
-        var html = web.Load(url);
-
+        if (html is null)
+            return new Group[0];
 
         var groupsSection = html.QuerySelector(".py-2");
         var groups = groupsSection.QuerySelectorAll("a");
@@ -34,9 +33,32 @@ public static class Parser
             string engCode = groups[i].GetAttributeValue("href", "");
 
             result[i] = new Group(faculty, uaCode, engCode);
-            Console.WriteLine(result[i]);
         }
 
         return result;
+    }
+
+    private static HtmlDocument? ParsePage(string url)
+    {
+        HtmlWeb web = new HtmlWeb();
+
+        HtmlDocument html;
+        
+        try
+        {
+            html = web.Load(url);
+        }
+        catch
+        {
+            Console.WriteLine("Неправильная ссылка или сайт недоступен");
+            return null;
+        }
+
+        return html;
+    }
+
+    public static void ParseSchedule(string engGroupCode)
+    {
+        
     }
 }
