@@ -25,7 +25,7 @@ using khai_schedule_bot.Models;
 // }
 
 
-Parser.ParseSchedule("515st2");
+Parser.ParseSchedule("515ist");
 
 
 // using System.Reflection;

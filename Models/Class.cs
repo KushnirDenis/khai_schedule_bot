@@ -10,7 +10,7 @@ public class Class
     /// </summary>
     public int Number { get; set; }
 
-    public WeekType WeekType { get; set; }
+    public WeekType? WeekType { get; set; }
     public string Name { get; set; }
     public ClassType ClassType { get; set; }
     public string? TeacherName { get; set; }
@@ -30,6 +30,7 @@ public class Class
     {
         GroupId = groupId;
         Number = number;
+        WeekType = weekType;
         Name = name;
         ClassType = classType;
         TeacherName = teacherName;
