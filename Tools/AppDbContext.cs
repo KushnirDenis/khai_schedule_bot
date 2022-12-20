@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public int TotalFaculties { get; } = 8;
     public DbSet<Class> Classes { get; set; }
     public DbSet<Group> Groups { get; set; }
+    public DbSet<BotUser> Users { get; set; }
 
     public AppDbContext()
     {

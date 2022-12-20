@@ -2,6 +2,7 @@ using khai_schedule_bot.Tools;
 using Telegram.Bot;
 using System.Reflection;
 using khai_schedule_bot.Models;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Exceptions;
@@ -62,7 +63,22 @@ public static class TelegramBot
         cts.Cancel();
     }
 
-    private static async BotUser GetUser(int chatId)
+    private static async Task<BotUser?> GetUser(long chatId)
+    {
+        return await _db.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+    }
+
+    private static async void RegisterUser(long chatId)
+    {
+        
+    }
+
+    private static async void CheckState(BotUser user)
+    {
+        
+    }
+    
+    private static async void CheckState(long chatId)
     {
         
     }
@@ -76,25 +92,23 @@ public static class TelegramBot
         if (message.Text is not { } messageText)
             return;
 
-        var chat = message.Chat;
+        var chatId = message.Chat.Id;
 
         if (messageText == "/start")
         {
-            if (GetUser(chat.Id) != null)
+            var user = await GetUser(chatId);
+            // Пользователь уже есть в базе
+            if ( user != null)
             {
-                
+                CheckState(user);
+            } // Пользователя нет в базе
+
+            {
+                CheckState(chatId);
             }
         }
 
-        var chatId = message.Chat.Id;
-
-        Console.WriteLine($"Received a '{messageText}' message in chat {chatId}.");
-
-        // Echo received message text
-        Message sentMessage = await bot.SendTextMessageAsync(
-            chatId: chatId,
-            text: "You said:\n" + messageText,
-            cancellationToken: cancellationToken);
+        
     }
     private static Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
