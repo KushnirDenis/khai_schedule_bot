@@ -15,25 +15,29 @@ public static class Parser
     /// </summary>
     /// <param name="department">Код кафедры</param>
     /// <returns>Список групп для кафедры</returns>
-    public static Group[] ParseGroups(int department)
+    public static List<Group> ParseGroups(int department)
     {
         var html = ParsePage($"https://education.khai.edu/department/{department}");
 
         if (html is null)
-            return new Group[0];
+            return new List<Group>();
 
         var groupsSection = html.QuerySelector(".py-2");
         var groups = groupsSection.QuerySelectorAll("a");
 
-        Group[] result = new Group[groups.Count];
+        List<Group> result = new List<Group>();
         int faculty = department / 100;
 
         for (int i = 0; i < groups.Count; i++)
         {
-            string uaCode = WebUtility.HtmlDecode(groups[i].InnerText.Replace(", ", ""));
             string engCode = groups[i].GetAttributeValue("href", "").Split("/")[^1];
 
-            result[i] = new Group(faculty, department, uaCode, engCode);
+            if (engCode.StartsWith("d"))
+                continue;
+            
+            string uaCode = WebUtility.HtmlDecode(groups[i].InnerText.Replace(", ", ""));
+
+            result.Add(new Group(faculty, department, uaCode, engCode));
         }
 
         return result;
@@ -60,14 +64,25 @@ public static class Parser
         return html;
     }
 
-    public static List<Class> ParseSchedule(string engGroupCode)
+    public static List<Class> ParseClasses(string engGroupCode)
     {
+        if (engGroupCode.StartsWith("d"))
+            return new List<Class>();
+        
         List<Class> result = new List<Class>();
+
         Group group = _db.Groups.First(g => g.EngCode == engGroupCode);
 
         var html = ParsePage($"https://education.khai.edu/union/schedule/group/{engGroupCode}");
         if (html is null)
             return new List<Class>();
+
+        var htmlText = WebUtility.HtmlDecode(html.Text);
+        if (htmlText.Contains("Заочна") || htmlText.Contains("Екзамени"))
+        {
+            _db.Remove(group);
+            return new List<Class>();
+        }
 
         var tableRows = html.QuerySelectorAll("tr");
 
@@ -117,15 +132,24 @@ public static class Parser
                 var info = WebUtility.HtmlDecode(head[0].InnerText.Trim()).Split(", ");
                 if (info.Length == 2)
                 {
+                    // [0] Фізичне виховання; [1] практика;
                     result.Add(new Class(group.Id, counter, WeekType.Denominator, info[0], ClassType.Practice,
                         null, null,
                         dayOfWeek, DateTime.ParseExact(tmpTime[0], "HH:mm", CultureInfo.InvariantCulture),
                         DateTime.ParseExact(tmpTime[1], "HH:mm", CultureInfo.InvariantCulture)));
                 }
-                else
+                else if (info.Length == 4)
                 {
+                    // [0] 123p; [1] Архітектура комп'ютерів, [2] лаб. практикум, [3] доцент Дужий Вячеслав Ігорович;
                     result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
                         info[3], info[0],
+                        dayOfWeek, DateTime.ParseExact(tmpTime[0], "HH:mm", CultureInfo.InvariantCulture),
+                        DateTime.ParseExact(tmpTime[1], "HH:mm", CultureInfo.InvariantCulture)));
+                } else
+                {
+                    // [0] 232бр, [1] Захист інформації в КС, [2] практика
+                    result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
+                        null, info[0],
                         dayOfWeek, DateTime.ParseExact(tmpTime[0], "HH:mm", CultureInfo.InvariantCulture),
                         DateTime.ParseExact(tmpTime[1], "HH:mm", CultureInfo.InvariantCulture)));
                 }
@@ -155,15 +179,24 @@ public static class Parser
 
                     if (info.Length == 2)
                     {
+                        // [0] Фізичне виховання; [1] практика;
                         result.Add(new Class(group.Id, counter, WeekType.Denominator, info[0], ClassType.Practice,
                             null, null,
                             dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
                             DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
                     }
-                    else
+                    else if (info.Length == 4)
                     {
+                        // [0] 123p; [1] Архітектура комп'ютерів, [2] лаб. практикум, [3] доцент Дужий Вячеслав Ігорович;
                         result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
                             info[3], info[0],
+                            dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
+                            DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
+                    } else
+                    {
+                        // [0] 232бр, [1] Захист інформації в КС, [2] практика
+                        result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
+                            null, info[0],
                             dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
                             DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
                     }
@@ -180,15 +213,25 @@ public static class Parser
 
                     if (infoArr.Length == 2)
                     {
+                        // [0] Фізичне виховання; [1] практика;
                         result.Add(new Class(group.Id, counter, WeekType.Numerator, infoArr[0], ClassType.Practice,
                             null, null,
                             dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
                             DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
                     }
-                    else
+                    else if (infoArr.Length == 4)
                     {
+                        // [0] 123p; [1] Архітектура комп'ютерів, [2] лаб. практикум, [3] доцент Дужий Вячеслав Ігорович;
                         result.Add(new Class(group.Id, counter, WeekType.Numerator, infoArr[1], ClassType.Practice,
                             infoArr[3], infoArr[0],
+                            dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
+                            DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
+                    }
+                    else
+                    {
+                        // [0] 232бр, [1] Захист інформації в КС, [2] практика
+                        result.Add(new Class(group.Id, counter, WeekType.Numerator, infoArr[1], ClassType.Practice,
+                            null, infoArr[0],
                             dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
                             DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
                     }
@@ -234,7 +277,7 @@ public static class Parser
                     dayOfWeek, DateTime.ParseExact(time[0], "HH:mm", CultureInfo.InvariantCulture),
                     DateTime.ParseExact(time[1], "HH:mm", CultureInfo.InvariantCulture)));
             }
-            else
+            else if (rowInfo.Length == 4)
             {
                 ClassType ct = rowInfo[2] == "лекція" ? ClassType.Lecture : ClassType.Practice;
 
@@ -242,12 +285,18 @@ public static class Parser
                     rowInfo[3], rowInfo[0],
                     dayOfWeek, DateTime.ParseExact(time[0], "HH:mm", CultureInfo.InvariantCulture),
                     DateTime.ParseExact(time[1], "HH:mm", CultureInfo.InvariantCulture)));
+            } else
+            {
+                // [0] 232бр, [1] Захист інформації в КС, [2] практика
+                result.Add(new Class(group.Id, counter, WeekType.Numerator, rowInfo[1], ClassType.Practice,
+                    null, rowInfo[0],
+                    dayOfWeek, DateTime.ParseExact(time[0], "HH:mm", CultureInfo.InvariantCulture),
+                    DateTime.ParseExact(time[1], "HH:mm", CultureInfo.InvariantCulture)));
             }
 
             counter++;
         }
 
-        foreach (var r in result) Console.WriteLine(r);
         return result;
     }
 }

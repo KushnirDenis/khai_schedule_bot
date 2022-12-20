@@ -25,12 +25,6 @@ public class AppDbContext : DbContext
         _configuration = configuration;
     }
 
-    public void RecreateGroups(IEnumerable<Group> groups)
-    {
-        Groups.AddRange(groups);
-        SaveChanges();
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         string? connectionString = _configuration.GetValue<string>("ConnectionString");
