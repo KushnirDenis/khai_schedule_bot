@@ -10,6 +10,19 @@ public static class Parser
 {
     private static AppDbContext _db = new AppDbContext();
 
+    public static WeekType GetWeekType()
+    {
+        var html = ParsePage("https://education.khai.edu/union/schedule/group/515st2");
+
+        var weekTypeHtml = html.QuerySelector(".mud-input-control .mud-input-label-text");
+
+        var weekType = WebUtility.HtmlDecode(weekTypeHtml.InnerHtml);
+        if (weekType.Contains("(числ.)"))
+            return WeekType.Numerator;
+
+        return WeekType.Denominator;
+    }
+
     /// <summary>
     /// Парсит группы с сайта кафедры.
     /// </summary>
@@ -34,7 +47,7 @@ public static class Parser
 
             if (engCode.StartsWith("d"))
                 continue;
-            
+
             string uaCode = WebUtility.HtmlDecode(groups[i].InnerText.Replace(", ", ""));
 
             result.Add(new Group(faculty, department, uaCode, engCode));
@@ -68,7 +81,7 @@ public static class Parser
     {
         if (engGroupCode.StartsWith("d"))
             return new List<Class>();
-        
+
         List<Class> result = new List<Class>();
 
         Group group = _db.Groups.First(g => g.EngCode == engGroupCode);
@@ -145,7 +158,8 @@ public static class Parser
                         info[3], info[0],
                         dayOfWeek, DateTime.ParseExact(tmpTime[0], "HH:mm", CultureInfo.InvariantCulture),
                         DateTime.ParseExact(tmpTime[1], "HH:mm", CultureInfo.InvariantCulture)));
-                } else
+                }
+                else
                 {
                     // [0] 232бр, [1] Захист інформації в КС, [2] практика
                     result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
@@ -192,7 +206,8 @@ public static class Parser
                             info[3], info[0],
                             dayOfWeek, DateTime.ParseExact(timeArr[0], "HH:mm", CultureInfo.InvariantCulture),
                             DateTime.ParseExact(timeArr[1], "HH:mm", CultureInfo.InvariantCulture)));
-                    } else
+                    }
+                    else
                     {
                         // [0] 232бр, [1] Захист інформації в КС, [2] практика
                         result.Add(new Class(group.Id, counter, WeekType.Denominator, info[1], ClassType.Practice,
@@ -285,7 +300,8 @@ public static class Parser
                     rowInfo[3], rowInfo[0],
                     dayOfWeek, DateTime.ParseExact(time[0], "HH:mm", CultureInfo.InvariantCulture),
                     DateTime.ParseExact(time[1], "HH:mm", CultureInfo.InvariantCulture)));
-            } else
+            }
+            else
             {
                 // [0] 232бр, [1] Захист інформації в КС, [2] практика
                 result.Add(new Class(group.Id, counter, WeekType.Numerator, rowInfo[1], ClassType.Practice,

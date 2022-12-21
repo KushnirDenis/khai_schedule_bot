@@ -1,7 +1,6 @@
 using System.Reflection;
 using khai_schedule_bot.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Migrations.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace khai_schedule_bot.Tools;

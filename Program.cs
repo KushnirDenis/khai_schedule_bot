@@ -60,31 +60,31 @@ for (int i = 0; i < args.Length; i++)
             _db.Groups.AddRange(Parser.ParseGroups(department));
         }
         _db.SaveChanges();
+
+        Console.WriteLine("Groups added successfully");
         
         foreach (var group in _db.Groups)
         {
             _db.Classes.AddRange(Parser.ParseClasses(group.EngCode));
         }
         _db.SaveChanges();
+        
+        Console.WriteLine("Classes added successfully");
     }
 }
 
 
 TelegramBot.StartInNewThread();
-while (true)
-{
-    string message = Console.ReadLine();
-    await TelegramBot.Bot.SendTextMessageAsync(326623471, message);
-    
-    var st2 = _db.Groups.First(group => group.EngCode == "515st2");
-    var classesInMonay = _db.Classes.Where(c => 
-        c.DayOfWeek == DayOfWeek.Monday && c.Group.Id == st2.Id).OrderBy(c => c.Number).ToList();
+Console.ReadLine();
 
-    // StringBuilder sb = new StringBuilder();
-    // foreach (var c in classesInMonay)
-    // {
-    //     sb.Append(c + "\n");
-    //     
-    // }
-    await TelegramBot.Bot.SendTextMessageAsync(326623471, classesInMonay[0].ToString(), ParseMode.Html);
-}
+// while (true)
+// {
+//     string message = Console.ReadLine();
+//     await TelegramBot.Bot.SendTextMessageAsync(326623471, message);
+//     
+//     var st2 = _db.Groups.First(group => group.EngCode == "515st2");
+//     var classesInMonay = _db.Classes.Where(c => 
+//         c.DayOfWeek == DayOfWeek.Monday && c.Group.Id == st2.Id).OrderBy(c => c.Number).ToList();
+//
+     
+// }
