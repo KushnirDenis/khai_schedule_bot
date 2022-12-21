@@ -83,9 +83,9 @@ public static class TelegramBot
         cts.Cancel();
     }
 
-    private static async Task<BotUser?> GetUser(long chatId)
+    private static BotUser? GetUser(long chatId)
     {
-        return await _db.Users.FirstOrDefaultAsync(u => u.ChatId == chatId);
+        return _db.Users.FirstOrDefault(u => u.ChatId == chatId);
     }
 
     private static async void RegisterUser(Chat chat)
@@ -101,7 +101,7 @@ public static class TelegramBot
 
         _db.Users.Add(newUser);
 
-        await _db.SaveChangesAsync();
+        _db.SaveChanges();
 
         await Bot.SendTextMessageAsync(chat.Id, "Введіть ім'я та прізвище <b>через " +
                                                 "пробіл</b> (напр. Іван Іванов)",
@@ -279,7 +279,7 @@ public static class TelegramBot
         if (chatId == Int64.MinValue)
             chatId = chat.Id;
 
-        var user = await GetUser(chatId);
+        var user = GetUser(chatId);
 
         // Пользователя нет в базе
         if (user == null)

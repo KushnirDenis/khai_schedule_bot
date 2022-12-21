@@ -8,7 +8,6 @@ namespace khai_schedule_bot.Tools;
 public class AppDbContext : DbContext
 {
     private readonly IConfiguration _configuration;
-    public int TotalFaculties { get; } = 8;
     public DbSet<Class> Classes { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<BotUser> Users { get; set; }
