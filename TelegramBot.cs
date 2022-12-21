@@ -260,7 +260,7 @@ public static class TelegramBot
                         callbackData: $"group:{user.ChatId}:{group}")
                 });
         }
-        
+
         InlineKeyboardMarkup inlineKeyboard = new(buttons);
 
         await Bot.SendTextMessageAsync(
@@ -319,7 +319,15 @@ public static class TelegramBot
                     .FirstOrDefault(c => c.GroupId == user.GroupId &&
                                          c.DayOfWeek == now.DayOfWeek &&
                                          (c.WeekType == WeekType || c.WeekType == 0) &&
-                                         (c.StartTime.Hour - now.Hour) > 0);
+                                         (
+                                             ((c.StartTime.Hour - now.Hour) > 0) ||
+                                             (
+                                                 ((c.StartTime.Hour - now.Hour) == 0) &&
+                                                 ((c.StartTime.Minute - now.Minute) > 0)
+                                             )
+                                         ));
+
+
                 if (classes is null)
                 {
                     await Bot.SendTextMessageAsync(chatId, "Більше пар сьогодні немає 🎉",

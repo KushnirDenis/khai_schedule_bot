@@ -76,15 +76,3 @@ for (int i = 0; i < args.Length; i++)
 
 TelegramBot.StartInNewThread();
 Console.ReadLine();
-
-// while (true)
-// {
-//     string message = Console.ReadLine();
-//     await TelegramBot.Bot.SendTextMessageAsync(326623471, message);
-//     
-//     var st2 = _db.Groups.First(group => group.EngCode == "515st2");
-//     var classesInMonay = _db.Classes.Where(c => 
-//         c.DayOfWeek == DayOfWeek.Monday && c.Group.Id == st2.Id).OrderBy(c => c.Number).ToList();
-//
-     
-// }
