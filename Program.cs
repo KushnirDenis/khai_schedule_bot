@@ -83,8 +83,8 @@ var startTimes = (from c in _db.Classes select c.StartTime).Distinct().OrderBy(c
 
 while (true)
 {
-    // var now = DateTime.Now;
-    var now = new DateTime(1001, 1, 21, 9, 40, 0);
+    // var now = new DateTime(1001, 1, 21, 9, 40, 0);
+    var now = DateTime.Now;
     
     // Если день не >= Понедельник и не <= Пятнице
     if (!(now.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday))
