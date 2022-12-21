@@ -330,7 +330,7 @@ public static class TelegramBot
 
                 if (classes is null)
                 {
-                    await Bot.SendTextMessageAsync(chatId, "Більше пар сьогодні немає 🎉",
+                    await Bot.SendTextMessageAsync(chatId, "Сьогодні пар більше немає 🎉",
                         ParseMode.Html);
                     return;
                 }
