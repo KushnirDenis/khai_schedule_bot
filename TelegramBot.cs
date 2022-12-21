@@ -35,7 +35,6 @@ public static class TelegramBot
     public static void StartInNewThread()
     {
         _thread.Start();
-        UpdateWeekType();
     }
 
     public static void UpdateWeekType()
@@ -45,6 +44,7 @@ public static class TelegramBot
 
     public async static void Start()
     {
+        UpdateWeekType();
         IConfiguration configuration = new ConfigurationBuilder()
             .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
             .Build();
