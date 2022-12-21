@@ -147,9 +147,4 @@ while (true)
     
 }
 
-foreach (var time in startTimes)
-{
-    Console.WriteLine(time.ToShortTimeString());
-}
-
 Console.ReadLine();
