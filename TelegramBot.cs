@@ -35,6 +35,11 @@ public static class TelegramBot
     public static void StartInNewThread()
     {
         _thread.Start();
+        UpdateWeekType();
+    }
+
+    public static void UpdateWeekType()
+    {
         WeekType = Parser.GetWeekType();
     }
 

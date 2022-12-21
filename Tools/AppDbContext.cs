@@ -18,11 +18,13 @@ public class AppDbContext : DbContext
         _configuration = new ConfigurationBuilder()
             .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
             .Build();
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     public AppDbContext(IConfiguration configuration)
     {
         _configuration = configuration;
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -35,6 +37,8 @@ public class AppDbContext : DbContext
             throw new Exception("ConnectionString is null");
         }
         
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseNpgsql(connectionString);
+        
+        
     }
 }

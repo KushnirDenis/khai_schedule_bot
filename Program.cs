@@ -85,7 +85,7 @@ while (true)
 {
     // var now = new DateTime(1001, 1, 21, 9, 40, 0);
     var now = DateTime.Now;
-    
+
     // Если день не >= Понедельник и не <= Пятнице
     if (!(now.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday))
     {
@@ -99,7 +99,8 @@ while (true)
         Logger.Log(msg);
         Console.WriteLine(msg);
         
-        Thread.Sleep((int)ms);    
+        Thread.Sleep((int)ms);
+        TelegramBot.UpdateWeekType();
     }
 
     if (now.Hour > startTimes[^1].Hour - 1)
@@ -108,6 +109,7 @@ while (true)
         var ms = (int)tmp.Subtract(now).TotalMilliseconds;
         Console.WriteLine($"{ms} ms sleep (кончилась последняя пара)");
         Thread.Sleep(ms);
+        TelegramBot.UpdateWeekType();
     }
 
     for (int i = 0; i < startTimes.Count; i++)
